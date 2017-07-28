@@ -1,4 +1,5 @@
-"""The Gillespie algorithm.
+"""
+The Gillespie algorithm.
 M. Ritchie June 2017. 
 This has not yet been compared to ODEs.
 """
@@ -8,9 +9,11 @@ import random
 
 
 class Gillespie(object):
-    """The Gillepsie agloritm for simulating epidemics."""
+    """
+    The Gillespsie algorithm for simulating SIR epidemics.
+    """
 
-    def __init__(self, size=50, tau=5.0, gamma=1.0, I0=1, dt=0.01,
+    def __init__(self, size=10, tau=5.0, gamma=1.0, I0=1, dt=0.01,
                  tmax=None):
 
         # Number of nodes.
@@ -27,11 +30,11 @@ class Gillespie(object):
         self._I = [1]
         self._R = [0]
 
-        # The state of and rate experianced by each node.
+        # The state of and rate experienced by each node.
         self._state = np.zeros((size,))
         self._rate = np.zeros((size,))
 
-        # Set for lookups
+        # Set for lookups.
         self._Snodes = set(np.arange(size))
 
         # I0, initial seed.
@@ -43,36 +46,21 @@ class Gillespie(object):
         # Used to quantise data.
         self._dt = dt
 
-    def __call__(self, size=50, tau=5.0, gamma=1.0, I0=1, dt=0.01, tmax=None):
+    def __call__(self, tau=5.0):
 
-        # Number of nodes.
-        self._N = size
         # Network model.
-        self._A = nx.fast_gnp_random_graph(size, 5 / size)
-        # Epidemic parameters.
-        self._tau = tau  # Per link rate of infection.
-        self._gamma = gamma
-        self._I0 = I0
-        # Time and population counts.
-        self._T = [0.0]
-        self._S = [size - 1]
-        self._I = [1]
-        self._R = [0]
+        self._A = nx.fast_gnp_random_graph(self._N, 5 / self._N)
 
-        # The state of and rate experianced by each node.
-        self._state = np.zeros((size,))
-        self._rate = np.zeros((size,))
+        self._tau = tau
 
-        # Set for lookups
-        self._Snodes = set(np.arange(size))
+        # The state of and rate experienced by each node.
+        self._state = np.zeros((self._N,))
+        self._rate = np.zeros((self._N,))
 
+        # Set for lookups.
+        self._Snodes = set(np.arange(self._N))
         self.setInitialSeed()
-
         self._cumulateRate = np.cumsum(self._rate)
-
-        self._tmax = tmax
-        # Used to quantise data.
-        self._dt = dt
 
         return self.stepUntil()
 

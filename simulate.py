@@ -31,7 +31,7 @@ class Simulate(object):
         self._results = pd.DataFrame()
 
         # Epidemic model (contains network model).
-        self._model = Gillespie.Gillespie
+        self._model = Gillespie.Gillespie(size=size)
 
     def multiSim(self):
         '''Compute multiple Monte Carlo simulation across all available 
@@ -39,10 +39,9 @@ class Simulate(object):
         procpool = multiprocessing.pool.Pool()
         parameters = [] 
         for i in range(self._repetitions):
-            parameters.append( (self._size, self._tau, self._gamma,
-                                self._I0, self._dt) )
+            parameters.append( self._tau )
 
-        results = list(procpool.starmap(self._model(), parameters))
+        results = procpool.map(self._model, parameters)
         
         # Usefull for debugging.
         # self.plotCloud(results) 
@@ -84,7 +83,7 @@ class Simulate(object):
     
     @property
     def getData(self):
-        '''Return the simulated data'''
+        '''Return the simulated data.'''
         return self._results
 
 
